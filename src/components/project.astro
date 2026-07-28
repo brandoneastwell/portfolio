@@ -5,7 +5,7 @@ import github from '../assets/github.svg';
 import arrow from '../assets/arrow-right-up-line.svg'
 ---
 
-<div data-index={index} class="project relative w-full h-full max-h-[250px] rounded-2xl overflow-hidden cursor-pointer">
+<div data-index={index} class="project relative w-full h-[250px] max-h-[250px] rounded-2xl overflow-hidden cursor-pointer" style="-webkit-clip-path: inset(0 round 1rem); clip-path: inset(0 round 1rem);">
     <a class="absolute w-full h-full" href={liveUrl} target="_blank">
         <div class="content absolute bg-[#1A1A1B]/50 flex flex-col w-full h-full max-h-[250px] z-20 p-6 gap-1.5 justify-between">
             <a class="h-6 w-6 z-50" href={gitUrl} target="_blank">
@@ -14,14 +14,14 @@ import arrow from '../assets/arrow-right-up-line.svg'
             <div>
                 <p class="text-3xl font-jersey text-[#EAE6E3]">{ title } <img class="arrow opacity-0 inline h-7" src={arrow.src} alt="arrow"></p>
                 <div class="flex flex-row flex-wrap space-x-1">
-                    { tools.map(tool => (
+                    { tools.map((tool) => (
                             <Tool tool={tool} />
                     ))}
                 </div>
             </div>
         </div>
     </a>
-    <img class="gif blur-[3px] w-full object-cover" src={img} alt="project demonstration background" />
+    <img class="gif absolute left-0 top-0 w-full max-w-none rounded-2xl blur-[3px]" style="height: auto; transform: translateZ(0);" src={img} alt="project demonstration background" />
 </div>
 
 <script>
