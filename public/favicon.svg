@@ -1,3 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="64" height="64" viewBox="0 0 64 64"><image width="64" height="64" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAACXBIWXMAAC4jAAAuIwF4pT92AAABTElEQVR4nO2bzQ2CQBCFH8YGvHAg4YIl2IK2oq3YgrairegFgwkWgTeDGn+WsLzRed/N3335Mjssk5A0TQPPjNgB2EgAOwCbcegPLufTHMAuQpZPrNIs3776sGsvc18BEsAOwCYJ3TvEHnBHmuVJ+7V6QEfcCwi+DFqhrsp2ze8BLLr8j/sKkAB2ADaxe8AxzfLpN1+sq7IAcIic5wn3FSAB7ABszJwD0iw/Argdb+uqXALYxF7XfQVIADsAGzM9QOcAEhLADsAmdg8oHu7bzeG+AtwLMHMZDEVT4Z6QAHYANj/bAzQW7wkJYAdgo7H40AtaQwLYAdiYOQdoLE7CvQAzW6CuygmAZeut2RDrmhEAYAJgPfSi7reAewGaCrMDsJEAdgA2li6DQWgs3hPuBfzSFnj7zFBX3FeABLADsAl+ZujfcF8BEsAOwOYKDfdM6Zxh3kIAAAAASUVORK5CYII="></image><style>@media (prefers-color-scheme: light) { :root { filter: none; } }
-@media (prefers-color-scheme: dark) { :root { filter: none; } }
-</style></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <rect x=".5" y=".5" width="15" height="15" rx="3" fill="#242425"/>
+  <path d="m4 5 3 3-3 3m5 0h3" fill="none" stroke="#eae6e3" stroke-width="1.5" stroke-linecap="square"/>
+</svg>
