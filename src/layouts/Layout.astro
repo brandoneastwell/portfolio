@@ -1,6 +1,7 @@
 ---
 import  SpeedInsights  from "@vercel/speed-insights/astro"
 import Analytics from '@vercel/analytics/astro'
+
 ---
 <!doctype html>
 <html lang="en">
@@ -16,7 +17,256 @@ import Analytics from '@vercel/analytics/astro'
 	</head>
 	<SpeedInsights />
 	<Analytics />
-	<body class="min-h-screen h-auto w-screen overflow-x-hidden bg-gradient-to-bl from-[#212121] from-5% to-[#1A1A1B] to-50%">
+	<body class="portfolio-background isolate min-h-screen h-auto overflow-x-hidden bg-[#1A1A1B]">
+		<div class="ambient-light" aria-hidden="true">
+            <canvas class="ambient-dust"></canvas>
+        </div>
 		<slot />
+		<div class="pointer-circle" aria-hidden="true" hidden></div>
 	</body>
 </html>
+<script>
+    const pointerCircle = document.querySelector<HTMLElement>(".pointer-circle");
+    const smoothCursor = window.matchMedia("(any-pointer: fine) and (prefers-reduced-motion: no-preference)");
+
+    if (pointerCircle) {
+        const circle = pointerCircle;
+        let x = 0;
+        let y = 0;
+        let targetX = 0;
+        let targetY = 0;
+        let frame = 0;
+
+        function render() {
+            circle.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+        }
+
+        function follow() {
+            x += (targetX - x) * 0.18;
+            y += (targetY - y) * 0.18;
+
+            if (Math.hypot(targetX - x, targetY - y) < 0.2) {
+                x = targetX;
+                y = targetY;
+                frame = 0;
+            } else {
+                frame = requestAnimationFrame(follow);
+            }
+
+            render();
+        }
+
+        function hide() {
+            cancelAnimationFrame(frame);
+            frame = 0;
+            circle.hidden = true;
+            document.body.classList.remove("custom-cursor");
+        }
+
+        window.addEventListener("pointermove", (event) => {
+            if (!smoothCursor.matches || event.pointerType !== "mouse") {
+                hide();
+                return;
+            }
+
+            targetX = event.clientX;
+            targetY = event.clientY;
+
+            if (circle.hidden) {
+                x = targetX;
+                y = targetY;
+                render();
+                circle.hidden = false;
+                document.body.classList.add("custom-cursor");
+            } else if (!frame) {
+                frame = requestAnimationFrame(follow);
+            }
+        }, { passive: true });
+
+        document.documentElement.addEventListener("pointerleave", hide);
+        window.addEventListener("blur", hide);
+        smoothCursor.addEventListener("change", hide);
+    }
+
+    const dust = document.querySelector<HTMLCanvasElement>(".ambient-dust");
+    const light = dust?.parentElement;
+    const context = dust?.getContext("2d");
+
+    if (dust && light && context) {
+        const canvas = dust;
+        const ambientLight = light;
+        const ctx = context;
+        const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
+        const motes = Array.from({ length: 280 }, () => ({
+            x: 0.18 + Math.random() * 0.67,
+            fallProgress: Math.random(),
+            fallSpeed: 1.2 + Math.random() * 1.4,
+            radius: 0.4 + Math.random() * 0.55,
+            phase: Math.random() * Math.PI * 2,
+            period: 20_000 + Math.random() * 25_000,
+            brightness: 0.12 + Math.random() * 0.13,
+        }));
+        let width = 0;
+        let height = 0;
+        let frame = 0;
+        let lastDraw = -Infinity;
+
+        function draw(time: number) {
+            const lightStyle = getComputedStyle(ambientLight);
+            const lightX = width * parseFloat(lightStyle.getPropertyValue("--ambient-light-x")) / 100;
+            const lightY = height * parseFloat(lightStyle.getPropertyValue("--ambient-light-y")) / 100;
+
+            ctx.clearRect(0, 0, width, height);
+            ctx.fillStyle = "#f4efe2";
+
+            const fallDistance = height * 0.71;
+
+            for (const mote of motes) {
+                const phase = mote.phase + time / mote.period * Math.PI * 2;
+                const travelled = (mote.fallProgress * fallDistance + time * mote.fallSpeed / 1000) % fallDistance;
+                const y = height * 0.18 + travelled;
+                const x = mote.x * width + (y - height * 0.5) * 0.12 + Math.sin(phase) * 2;
+                const distance = Math.hypot((x - lightX) / (width * 0.43), (y - lightY) / (height * 0.46));
+                const illumination = Math.exp(-2 * (distance / 0.25) ** 2);
+                if (illumination < 0.02) continue;
+
+                ctx.globalAlpha = mote.brightness * illumination;
+                ctx.beginPath();
+                ctx.arc(x, y, mote.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function animate(time: number) {
+            if (time - lastDraw >= 40) {
+                draw(time);
+                lastDraw = time;
+            }
+            frame = requestAnimationFrame(animate);
+        }
+
+        function resize() {
+            width = canvas.clientWidth;
+            height = canvas.clientHeight;
+            const scale = Math.min(window.devicePixelRatio, 1.5);
+            canvas.width = Math.round(width * scale);
+            canvas.height = Math.round(height * scale);
+            ctx.setTransform(scale, 0, 0, scale, 0, 0);
+            draw(motion.matches ? performance.now() : 0);
+        }
+
+        function updateMotion() {
+            cancelAnimationFrame(frame);
+            if (motion.matches) {
+                frame = requestAnimationFrame(animate);
+            } else {
+                draw(0);
+            }
+        }
+
+        resize();
+        updateMotion();
+        window.addEventListener("resize", resize);
+        motion.addEventListener("change", updateMotion);
+    }
+</script>
+
+<style>
+    .pointer-circle {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 200;
+        width: 18px;
+        height: 18px;
+        translate: -50% -50%;
+        pointer-events: none;
+    }
+
+    .pointer-circle::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border: 1px solid #eae6e3;
+        border-radius: 50%;
+        background: rgb(26 26 27 / 50%);
+        scale: 1;
+        transition: scale 180ms ease-out;
+    }
+
+    :global(.custom-cursor:has(a:hover, .project:hover)) .pointer-circle::before {
+        scale: 1.35;
+    }
+
+    :global(.custom-cursor),
+    :global(.custom-cursor *) {
+        cursor: none !important;
+    }
+
+    @property --ambient-light-x {
+        syntax: "<percentage>";
+        inherits: true;
+        initial-value: 50%;
+    }
+
+    @property --ambient-light-y {
+        syntax: "<percentage>";
+        inherits: true;
+        initial-value: 50%;
+    }
+
+    .portfolio-background::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        pointer-events: none;
+        background: linear-gradient(to bottom left, #212121 5%, #1a1a1b 50%);
+    }
+
+    .ambient-light {
+        position: fixed;
+        inset: -40%;
+        z-index: -1;
+        pointer-events: none;
+        transform: translate(
+            calc(-3.4 * var(--pointer-shift-x, 0px)),
+            calc(-3.4 * var(--pointer-shift-y, 0px))
+        );
+        --light-shape: ellipse 43% 46% at var(--ambient-light-x) var(--ambient-light-y);
+        background: radial-gradient(
+            var(--light-shape),
+            rgb(235 236 240 / 8%),
+            rgb(235 236 240 / 5%) 18%,
+            rgb(235 236 240 / 2.4%) 35%,
+            rgb(235 236 240 / 1.2%) 52%,
+            rgb(235 236 240 / 0.45%) 68%,
+            rgb(235 236 240 / 0.12%) 82%,
+            rgb(235 236 240 / 0%) 100%
+        );
+    }
+
+    .ambient-dust {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .ambient-light {
+            animation: glow-horizontal 100s ease-in-out infinite, glow-vertical 100s ease-in-out -25s infinite;
+        }
+    }
+
+    @keyframes glow-horizontal {
+        0%, 100% { --ambient-light-x: 40%; }
+        50% { --ambient-light-x: 60%; }
+    }
+
+    @keyframes glow-vertical {
+        0%, 100% { --ambient-light-y: 43%; }
+        50% { --ambient-light-y: 57%; }
+    }
+
+</style>

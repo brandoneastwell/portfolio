@@ -8,18 +8,23 @@ import outdoorReflectionsDemo from "../assets/outdoor-reflections-page.png"
 ---
 
 <section class="projects-section mt-16">
-    <p class="text-xl text-[#EAE6E3] font-jersey uppercase tracking-widest"> Projects </p>
+    <h2 class="text-xl text-[#EAE6E3] font-jersey uppercase tracking-widest">Projects</h2>
     <div class="flex flex-col flex-wrap gap-6 mt-6">
-        <Project index="1" img={outdoorReflectionsDemo.src} gitUrl="https://github.com/brandoneastwell/outdoor-reflections" liveUrl="https://outdoor-reflections.vercel.app"
-                 title="Outdoor Reflections - Offline Journal" tools={["React", "TypeScript", "Next.js", "NestJS", "Prisma", "PostgreSQL"]} />
-        <Project index="2" img={photoappDemo.src} gitUrl="https://github.com/brandoneastwell/photography-app" liveUrl="https://photosmap.co.uk"
-                 title="Photography Sharing & Search Platform" tools={["React Native", "TypeScript", "Python", "Django", "PostgreSQL", "Mobile & Web"]} />
-        <Project index="3" img={sivterDemo.src} gitUrl="https://github.com/brandoneastwell/movie-discovery-app" liveUrl="https://sivter-app.vercel.app/"
-                 title="Sivter Movie Discovery" tools={["Next.js", "React", "TailwindCSS", "TypeScript", "Prisma", "PostgreSQL"]} />
-        <Project index="4" img={raDemo.src} gitUrl="https://github.com/brandoneastwell/ra-set-finder" liveUrl="https://github.com/BrandonEastwell/ra-set-finder"
-                 title="RA Set Finder" tools={["React", "TypeScript", "TailwindCSS", "Express", "Chrome Extension"]} />
-        <Project index="5" img={lrsDemo.src} gitUrl="https://github.com/brandoneastwell/lrs-services" liveUrl="https://lrs-services.vercel.app/"
-                 title="LRS Exterior Services" tools={["React", "TypeScript", "TailwindCSS", "Express"]} />
+        <Project index="1" toolBackground="#852b3c" edgeColor="#862d41" img={outdoorReflectionsDemo.src} gitUrl="https://github.com/brandoneastwell/outdoor-reflections" liveUrl="https://outdoor-reflections.com"
+                 title="Outdoor Reflections - Offline Journal"
+                 description="An offline hiking journal that syncs notes and sketches when you reconnect." tools={["React", "TypeScript", "Next.js", "NestJS", "Prisma", "PostgreSQL"]} />
+        <Project index="2" toolBackground="#30333a" img={photoappDemo.src} gitUrl="https://github.com/brandoneastwell/photography-app" liveUrl="https://photosmap.co.uk"
+                 title="Photography Sharing & Search Platform"
+                 description="A mobile and web platform for sharing and finding photos." tools={["React Native", "TypeScript", "Python", "Django", "PostgreSQL", "Mobile & Web"]} />
+        <Project index="3" toolBackground="#4c357a" img={sivterDemo.src} gitUrl="https://github.com/brandoneastwell/movie-discovery-app" liveUrl="https://sivter-app.vercel.app/"
+                 title="Sivter Movie Discovery"
+                 description="A web app for discovering films to watch." tools={["Next.js", "React", "TailwindCSS", "TypeScript", "Prisma", "PostgreSQL"]} />
+        <Project index="4" toolBackground="#a1232d" img={raDemo.src} gitUrl="https://github.com/brandoneastwell/ra-set-finder" liveUrl="https://github.com/BrandonEastwell/ra-set-finder"
+                 title="RA Set Finder"
+                 description="A Chrome extension that finds DJ sets on YouTube from Resident Advisor lineups." tools={["React", "TypeScript", "TailwindCSS", "Express", "Chrome Extension"]} />
+        <Project index="5" toolBackground="#18567b" img={lrsDemo.src} gitUrl="https://github.com/brandoneastwell/lrs-services" liveUrl="https://lrs-services.vercel.app/"
+                 title="LRS Exterior Services"
+                 description="A website showcasing a local exterior services business." tools={["React", "TypeScript", "TailwindCSS", "Express"]} />
     </div>
 </section>
 
@@ -27,7 +32,7 @@ import outdoorReflectionsDemo from "../assets/outdoor-reflections-page.png"
     import { gsap } from "gsap";
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
     gsap.registerPlugin(ScrollTrigger)
-    const title = document.querySelector('.projects-section p');
+    const title = document.querySelector('.projects-section h2');
 
     if (title) {
         gsap.fromTo(title,

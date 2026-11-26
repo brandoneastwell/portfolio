@@ -6,3 +6,16 @@
     --font-hanken: "Hanken Grotesk", sans-serif;
     --font-jersey: "Jersey 15", sans-serif;
 }
+
+
+.foreground-plane {
+    transform: translate(var(--pointer-shift-x, 0px), var(--pointer-shift-y, 0px))
+        perspective(950px)
+        rotateX(calc(var(--foreground-tilt, 5deg) + var(--pointer-tilt-x, 0deg)))
+        rotateY(var(--pointer-tilt-y, 0deg))
+        translateZ(var(--foreground-depth, 0px));
+}
+
+.foreground-plane:not(.flex) {
+    display: flow-root;
+}

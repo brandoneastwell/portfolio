@@ -1,51 +1,208 @@
 ---
 import Tool from "./tool.astro";
-const { gitUrl, liveUrl, title, img, tools, index } = Astro.props
+const { gitUrl, liveUrl, title, description, img, tools, toolBackground, edgeColor, index } = Astro.props
 import github from '../assets/github.svg';
-import arrow from '../assets/arrow-right-up-line.svg'
+import arrow from '../assets/arrow-right-up-line.svg';
 ---
 
-<div data-index={index} class="project relative w-full h-[250px] max-h-[250px] rounded-2xl overflow-hidden cursor-pointer" style="-webkit-clip-path: inset(0 round 1rem); clip-path: inset(0 round 1rem);">
-    <a class="absolute w-full h-full" href={liveUrl} target="_blank">
-        <div class="content absolute bg-[#1A1A1B]/50 flex flex-col w-full h-full max-h-[250px] z-20 p-6 gap-1.5 justify-between">
-            <a class="h-6 w-6 z-50" href={gitUrl} target="_blank">
-                <img class="opacity-80 transition duration-300 hover:scale-110 hover:opacity-100" src={github.src}  alt="github icon link" />
+<div class="foreground-plane project-plane">
+    <div class="project-shell" style={`--project-tool-background: ${toolBackground}; ${edgeColor ? `--project-edge-color: ${edgeColor};` : ""}`}>
+        <div class="project relative isolate flex min-h-[250px] w-full flex-col justify-between gap-4 overflow-hidden rounded-2xl bg-[#1A1A1B] p-6">
+            <img class="gif absolute inset-0 -z-20 h-full w-full object-cover object-top blur-[3px]" src={img} alt="" />
+            <div class="project-overlay absolute inset-0 -z-10 bg-[#1A1A1B]/75" aria-hidden="true"></div>
+            <a class="project-repo relative z-10 h-6 w-6" href={gitUrl} target="_blank" aria-label={`${title} on GitHub`}>
+                <img class="opacity-80 transition duration-300 hover:scale-110 hover:opacity-100" src={github.src} alt="" />
             </a>
-            <div>
-                <p class="text-3xl font-jersey text-[#EAE6E3]">{ title } <img class="arrow opacity-0 inline h-7" src={arrow.src} alt="arrow"></p>
-                <div class="flex flex-row flex-wrap space-x-1">
-                    { tools.map((tool) => (
-                            <Tool tool={tool} />
-                    ))}
+            <a class="absolute inset-0 z-[1] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white" href={liveUrl} target="_blank" aria-labelledby={`project-title-${index}`}></a>
+            <div class="project-details">
+                <h3 id={`project-title-${index}`} class="text-3xl font-jersey text-[#EAE6E3]">
+                    {title} <img class="project-arrow inline h-7" src={arrow.src} alt="" />
+                </h3>
+                <p class="mt-1 text-sm leading-snug font-hanken text-[#EAE6E3]">{description}</p>
+                <div class="mt-2 flex flex-row flex-wrap gap-x-1">
+                    {tools.map((tool) => <Tool tool={tool} />)}
                 </div>
             </div>
         </div>
-    </a>
-    <img class="gif absolute left-0 top-0 w-full max-w-none rounded-2xl blur-[3px]" style="height: auto; transform: translateZ(0);" src={img} alt="project demonstration background" />
+        <span class="project-edge" aria-hidden="true"><span class="project-edge-track"></span></span>
+    </div>
 </div>
+
+<style>
+    @property --foreground-depth {
+        syntax: "<length>";
+        inherits: false;
+        initial-value: 0px;
+    }
+
+    .project-plane {
+        --foreground-depth: 22px;
+        --foreground-tilt: 3.5deg;
+    }
+
+    .project-shell {
+        position: relative;
+        isolation: isolate;
+    }
+
+    .project-edge {
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        pointer-events: none;
+        opacity: 0;
+        filter: blur(5px)
+            drop-shadow(0 0 5px rgb(255 255 255 / 75%))
+            drop-shadow(0 0 26px rgb(255 255 255 / 48%));
+    }
+
+    .project-edge-track {
+        position: absolute;
+        inset: 0;
+        padding: 2px;
+        border-radius: 1rem;
+        mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+        mask-composite: exclude;
+    }
+
+    .project-edge-track::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 14rem;
+        height: 14rem;
+        --edge-tint: var(--project-edge-color, color-mix(in srgb, var(--project-tool-background) 75%, white));
+        background: radial-gradient(
+            circle closest-side,
+            color-mix(in srgb, var(--edge-tint) 62%, transparent),
+            color-mix(in srgb, var(--edge-tint) 60%, transparent) 25%,
+            color-mix(in srgb, var(--edge-tint) 35%, transparent) 60%,
+            transparent
+        );
+        offset-path: inset(1px round 15px);
+        offset-rotate: 0deg;
+        offset-distance: 21%;
+        pointer-events: none;
+    }
+
+    .project-details {
+        --tool-background: color-mix(in srgb, var(--project-tool-background) 25%, #212121);
+    }
+
+    .project-arrow {
+        opacity: 0;
+    }
+
+    .project:focus-within .project-arrow {
+        opacity: 1;
+        transform: none;
+    }
+
+    @media (hover: hover) {
+        .project-shell:hover .project-edge {
+            opacity: 1;
+        }
+
+        .project-shell:hover .project-edge-track::before {
+            offset-distance: 36%;
+        }
+
+        .project:hover .project-details {
+            --tool-background: var(--project-tool-background);
+        }
+
+        .project:hover .project-arrow {
+            opacity: 1;
+            transform: none;
+        }
+    }
+
+    @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+        .project-plane {
+            transition: --foreground-depth 300ms ease;
+        }
+
+        .project-plane:hover {
+            --foreground-depth: 42px;
+        }
+
+        .project-edge {
+            transition: opacity 160ms ease;
+        }
+
+        .project-edge-track::before {
+            transition: offset-distance 0s 160ms;
+        }
+
+        .project-shell:hover .project-edge-track::before {
+            transition: offset-distance 450ms cubic-bezier(0.12, 0.8, 0.25, 1);
+        }
+
+        .project-details {
+            transform-origin: bottom left;
+        }
+
+        .project-repo img {
+            transform-origin: top left;
+        }
+
+        .project-details,
+        .project-repo img {
+            transition: scale 260ms ease;
+        }
+
+        .project-arrow {
+            transition: opacity 200ms ease, transform 200ms ease;
+        }
+
+        .project:not(:hover):not(:focus-within) .project-arrow {
+            transform: translate(-0.4rem, 0.4rem);
+        }
+
+        .project-details :global(.tool) {
+            transition: background-color 340ms ease-in-out;
+        }
+
+        .project:hover .project-details :global(.tool) {
+            transition-duration: 220ms;
+        }
+
+        .project-overlay {
+            transition: background-color 260ms ease;
+        }
+
+        .project:hover .project-details {
+            scale: 0.65;
+        }
+
+        .project:hover .project-repo img {
+            scale: 0.88;
+        }
+
+        .project:hover .project-overlay {
+            background-color: rgb(26 26 27 / 62%);
+        }
+    }
+</style>
 
 <script>
     import { gsap } from "gsap";
     import { ScrollTrigger } from 'gsap/ScrollTrigger';
     gsap.registerPlugin(ScrollTrigger)
-    const elements = document.querySelectorAll('.project');
+    const elements = document.querySelectorAll('.project-shell');
 
     for (let el of elements) {
         if (el) {
             let project = el as HTMLElement
             project.addEventListener("mouseenter", () => {
                 gsap.to(project.querySelector(".gif"), { filter: 'blur(0px)', duration: 0.1, ease: "power2.in" })
-                gsap.to(project.querySelector(".arrow"), { startAt: { y: 8, x: -8 } , opacity: 1, y: 0, x: 0, duration: 0.2 })
-                gsap.to(project.querySelectorAll('.tool'), { backgroundColor: "#3c0366", transition: 0.1 })
             })
 
             project.addEventListener("mouseleave", () => {
                 gsap.to(project.querySelector(".gif"), { filter: 'blur(3px)', duration: 0.1, ease: "power2.in" })
-                gsap.to(project.querySelector(".arrow"), { opacity: 0, y: 8, x: -8, duration: 0.2 })
-                gsap.to(project.querySelectorAll('.tool'), { backgroundColor: "#212121", transition: 0.1 })
             })
 
-            const direction = parseInt(project.dataset.index?project.dataset.index:"0") % 2 === 0 ? -100 : 100;
             gsap.fromTo(project,
                 { x: -100, autoAlpha: 0 },
                 {
