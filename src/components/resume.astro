@@ -1,43 +1,32 @@
 ---
 import download from '../assets/download.svg';
 import resumeUrl from '../assets/brandon_eastwell_cv.pdf?url';
-
 ---
-<a href={resumeUrl} download="brandon_eastwell_cv.pdf">
-    <div class="download relative overflow-hidden min-w-[100px] max-w-[100px] flex flex-row gap-1 border border-white px-3 rounded-lg place-items-center justify-center cursor-pointer opacity-80 transition duration-300 hover:opacity-100">
-        <div class="mask absolute w-full h-full right-0 bg-white invisible"></div>
-        <img class="h-5" src={download.src}  alt="download icon" />
-        <p class="text-white font-jersey">Resume</p>
-    </div>
 
-    <script>
-        import { gsap } from "gsap";
-        let buttons = document.querySelectorAll(".download")
-
-        function clickHandler(event: any) {
-            let container = event.target.closest('.download')
-
-            gsap.to(container.querySelector(".mask"), { startAt: { y: 40, autoAlpha: 1 }, y: 0, autoAlpha: 1, transition: 0.2, ease: "power2.in" })
-
-            setTimeout(() => {
-                let text = container.querySelector("p")
-                let icon = container.querySelector("img")
-                if (text) text.textContent = "downloaded"
-                if (icon) icon.style.display = "none"
-                gsap.to(container.querySelector(".mask"), { y: -40, autoAlpha: 1, transition: 0.2, ease: "power2.out"})
-                sessionStorage.setItem("resumeDownloaded", "true")
-            }, 500)
-        }
-
-        for (let btn of buttons) {
-            if (sessionStorage.getItem("resumeDownloaded") === "true") {
-                let text = btn.querySelector("p")
-                let icon = btn.querySelector("img")
-                if (text) text.textContent = "downloaded"
-                if (icon) icon.style.display = "none"
-            }
-
-            btn.addEventListener("click", clickHandler)
-        }
-    </script>
+<a href={resumeUrl} download="brandon_eastwell_cv.pdf" data-resume-download
+    class="group inline-flex min-h-7 min-w-[100px] items-center justify-center gap-1.5 rounded-lg border border-white/15 bg-white/5 px-2.5 font-jersey text-sm text-[#EAE6E3] transition-colors hover:border-white/35 hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#EAE6E3]">
+    <img class="h-4 w-4 opacity-65 transition-opacity group-hover:opacity-100" src={download.src} alt="" />
+    <span>Resume</span>
 </a>
+
+<script>
+    const links = document.querySelectorAll<HTMLAnchorElement>("[data-resume-download]");
+
+    function showDownloadState() {
+        for (const link of links) {
+            const label = link.querySelector("span");
+            if (label) label.textContent = "Downloaded";
+        }
+    }
+
+    if (sessionStorage.getItem("resumeDownloaded") === "true") {
+        showDownloadState();
+    }
+
+    for (const link of links) {
+        link.addEventListener("click", () => {
+            sessionStorage.setItem("resumeDownloaded", "true");
+            showDownloadState();
+        });
+    }
+</script>
