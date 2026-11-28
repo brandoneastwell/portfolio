@@ -1,12 +1,18 @@
 ---
-import uniLogo from "../assets/University_of_Essex_logo.svg"
+import uniLogo from "../assets/University_of_Essex_logo.svg";
+
+interface Props {
+    compact?: boolean;
+}
+
+const { compact = false } = Astro.props;
 ---
 
-<section class="flex flex-row place-items-center mt-8 gap-1 font-jersey overflow-hidden">
-    <img src={uniLogo.src} alt="" class="uni logo h-16" />
+<section class:list={["flex flex-row items-center gap-1 font-jersey overflow-hidden", { "mt-8": !compact }]}>
+    <img src={uniLogo.src} alt="" class:list={["uni logo", compact ? "h-11 shrink-0" : "h-16"]} />
     <div>
         <span class="time text-sm text-[#EAE6E3]/40 uppercase tracking-wide"> Sept, 2021 - July, 2024 </span>
-        <p class="title text-xl text-[#EAE6E3]"> University of Essex Graduate </p>
-        <p class="course text-xl text-[#EAE6E3]"> Bachelor of Science in Computer Science </p>
+        <p class:list={["title text-[#EAE6E3]", compact ? "text-lg leading-tight" : "text-xl"]}> University of Essex Graduate </p>
+        <p class:list={["course text-[#EAE6E3]", compact ? "text-base leading-tight" : "text-xl"]}> Bachelor of Science in Computer Science </p>
     </div>
 </section>

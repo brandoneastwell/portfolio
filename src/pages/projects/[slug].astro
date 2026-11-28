@@ -1,0 +1,48 @@
+---
+import type { GetStaticPaths } from "astro";
+import OutdoorReflectionsCaseStudy from "../../components/outdoor-reflections-case-study.astro";
+import Layout from "../../layouts/Layout.astro";
+import { projects } from "../../data/projects";
+import "../../styles/global.css";
+
+export const getStaticPaths = (() => projects.map(({ slug, title, gitUrl, liveUrl }) => ({
+    params: { slug },
+    props: { title, gitUrl, liveUrl },
+}))) satisfies GetStaticPaths;
+
+const { title, gitUrl, liveUrl } = Astro.props;
+const isOutdoorReflections = Astro.params.slug === "outdoor-reflections";
+---
+
+<Layout title={`${title} | Brandon Eastwell`}>
+    <main class:list={["case-study mx-auto px-6 pt-8 pb-16 text-[#EAE6E3]", isOutdoorReflections ? "max-w-[698px]" : "max-w-[430px]"]}>
+        <a class="font-hanken text-sm underline underline-offset-4" href="/#projects">← Back to projects</a>
+        {isOutdoorReflections ? (
+            <OutdoorReflectionsCaseStudy title={title} gitUrl={gitUrl} liveUrl={liveUrl} />
+        ) : (
+            <h1 class="mt-10 font-jersey text-4xl">{title}</h1>
+        )}
+    </main>
+</Layout>
+
+<script is:inline>
+    let hasPageTransition = false;
+    window.addEventListener("pagereveal", (event) => {
+        hasPageTransition = Boolean(event.viewTransition);
+    });
+
+    window.addEventListener("pageshow", (event) => {
+        if (event.persisted || !document.referrer) return;
+        const previousPage = new URL(document.referrer);
+        if (previousPage.origin !== location.origin || previousPage.pathname !== "/") return;
+        if (!matchMedia("(prefers-reduced-motion: no-preference)").matches) return;
+
+        requestAnimationFrame(() => {
+            if (hasPageTransition) return;
+            document.querySelector(".case-study")?.animate(
+                [{ transform: "translateY(24vh)", opacity: 0 }, { transform: "translateY(0)", opacity: 1 }],
+                { duration: 440, easing: "cubic-bezier(0.33, 0.75, 0.26, 1)", fill: "backwards" }
+            );
+        });
+    });
+</script>

@@ -1,0 +1,25 @@
+---
+import Education from "./education.astro";
+---
+
+<section id="about" class="about-section" aria-labelledby="about-heading">
+    <h2 id="about-heading" class="sr-only">About me</h2>
+    <div class="desc mt-8 space-y-4 font-hanken text-base leading-relaxed text-[#EAE6E3]/90 min-[550px]:mt-4 min-[1100px]:mt-0 min-[1100px]:text-lg min-[1100px]:leading-relaxed">
+        <p>I’m a full-stack developer and first-class Computer Science graduate. My approach to engineering is to understand the problem well enough to own the outcome. I enjoy taking a feature from the first question to deployment, and I love the detective work when something breaks. I reproduce the issue, trace it from the UI through the API to the database, and test each assumption until I find the cause.</p>
+        <p>I start with what someone needs to be able to do and what could get in their way. In Outdoor Reflections, a hiking journal I built, losing signal was part of normal use. I saved notes and sketches in the browser first, then designed and tested how they sync when the connection returns, so an older edit from one device can’t overwrite newer work on another.</p>
+        <p>I get up to speed with unfamiliar tools by trying them on a small piece of the problem. I turn requirements into an implementation plan, define the data model and API contract, and weigh trade-offs around performance, security, and reliability. I use tests to guide development, document why I made key decisions, and automate checks in CI. AI agents help me explore options, implement and test faster. I review the code myself and test its behaviour before I ship it. I want to be able to explain why I built something the way I did and show how I know it works.</p>
+    </div>
+    <div class="about-education"><Education /></div>
+</section>
+
+<style>
+    @media (min-width: 1100px) {
+        .about-section {
+            width: 100%;
+        }
+
+        .about-education {
+            display: none;
+        }
+    }
+</style>

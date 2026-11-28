@@ -1,34 +1,74 @@
 ---
 import Tool from "./tool.astro";
-const { gitUrl, liveUrl, title, description, img, tools, toolBackground, edgeColor, index } = Astro.props
+const { gitUrl, liveUrl, title, description, img, tools, toolBackground, edgeColor, slug } = Astro.props
 import github from '../assets/github.svg';
 import arrow from '../assets/arrow-right-up-line.svg';
 ---
 
 <div class="foreground-plane project-plane">
     <div class="project-shell" style={`--project-tool-background: ${toolBackground}; ${edgeColor ? `--project-edge-color: ${edgeColor};` : ""}`}>
-        <div class="project relative isolate flex min-h-[250px] w-full flex-col justify-between gap-4 overflow-hidden rounded-2xl bg-[#1A1A1B] p-6">
-            <img class="gif absolute inset-0 -z-20 h-full w-full object-cover object-top blur-[3px]" src={img} alt="" />
-            <div class="project-overlay absolute inset-0 -z-10 bg-[#1A1A1B]/75" aria-hidden="true"></div>
-            <a class="project-repo relative z-10 h-6 w-6" href={gitUrl} target="_blank" aria-label={`${title} on GitHub`}>
-                <img class="opacity-80 transition duration-300 hover:scale-110 hover:opacity-100" src={github.src} alt="" />
-            </a>
-            <a class="absolute inset-0 z-[1] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white" href={liveUrl} target="_blank" aria-labelledby={`project-title-${index}`}></a>
+        <article class="project relative isolate flex w-full flex-col items-start justify-center gap-4 text-left overflow-hidden rounded-2xl bg-[#1A1A1B] p-6">
+            <img class="project-image absolute inset-0 -z-20 h-full w-full object-cover object-top" src={img} alt="" />
+            <div class="project-overlay absolute inset-0 -z-10 bg-[#1A1A1B]/80" aria-hidden="true"></div>
             <div class="project-details">
-                <h3 id={`project-title-${index}`} class="text-3xl font-jersey text-[#EAE6E3]">
-                    {title} <img class="project-arrow inline h-7" src={arrow.src} alt="" />
+                <h3 class="font-jersey text-2xl text-[#EAE6E3]">
+                    <a href={`/projects/${slug}/`} class="after:absolute after:inset-0 after:z-[1] focus-visible:after:ring-2 focus-visible:after:ring-inset focus-visible:after:ring-white">
+                        {title} <img class="project-arrow inline h-5" src={arrow.src} alt="" />
+                    </a>
                 </h3>
-                <p class="mt-1 text-sm leading-snug font-hanken text-[#EAE6E3]">{description}</p>
-                <div class="mt-2 flex flex-row flex-wrap gap-x-1">
+                <p class="mt-2 max-w-[38ch] font-hanken text-base font-medium leading-snug text-[#EAE6E3]">{description}</p>
+                <div class="mt-2 flex flex-wrap gap-x-1">
                     {tools.map((tool) => <Tool tool={tool} />)}
                 </div>
             </div>
-        </div>
+            <div class="flex flex-wrap gap-2">
+                <a class="project-action" href={gitUrl} target="_blank" rel="noopener noreferrer">
+                    <img class="h-4 w-4" src={github.src} alt="" /> View code
+                </a>
+                {liveUrl && (
+                    <a class="project-action" href={liveUrl} target="_blank" rel="noopener noreferrer">Try live demo</a>
+                )}
+            </div>
+        </article>
         <span class="project-edge" aria-hidden="true"><span class="project-edge-track"></span></span>
     </div>
 </div>
 
 <style>
+    @reference "../styles/global.css";
+
+    .project {
+        min-height: var(--project-height, 250px);
+    }
+
+    .project-image {
+        filter: grayscale(1) blur(2px);
+    }
+
+    .project:focus-within .project-image {
+        filter: none;
+    }
+
+    @media (hover: hover) {
+        .project:hover .project-image {
+            filter: none;
+        }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+        .project-image {
+            transition: filter 360ms ease;
+        }
+    }
+
+    .project-action {
+        @apply relative z-10 inline-flex min-h-8 items-center gap-1.5 rounded-lg border border-white/20 bg-[#1A1A1B]/85 px-2.5 font-hanken text-sm text-[#EAE6E3] transition-colors hover:border-white/45 hover:bg-[#343435] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white;
+    }
+
+    .project-details :global(.tool) {
+        font-size: 0.75rem;
+    }
+
     @property --foreground-depth {
         syntax: "<length>";
         inherits: false;
@@ -139,19 +179,6 @@ import arrow from '../assets/arrow-right-up-line.svg';
             transition: offset-distance 450ms cubic-bezier(0.12, 0.8, 0.25, 1);
         }
 
-        .project-details {
-            transform-origin: bottom left;
-        }
-
-        .project-repo img {
-            transform-origin: top left;
-        }
-
-        .project-details,
-        .project-repo img {
-            transition: scale 260ms ease;
-        }
-
         .project-arrow {
             transition: opacity 200ms ease, transform 200ms ease;
         }
@@ -172,51 +199,67 @@ import arrow from '../assets/arrow-right-up-line.svg';
             transition: background-color 260ms ease;
         }
 
-        .project:hover .project-details {
-            scale: 0.65;
-        }
-
-        .project:hover .project-repo img {
-            scale: 0.88;
-        }
-
         .project:hover .project-overlay {
-            background-color: rgb(26 26 27 / 62%);
+            background-color: rgb(26 26 27 / 74%);
         }
     }
 </style>
 
 <script>
     import { gsap } from "gsap";
-    import { ScrollTrigger } from 'gsap/ScrollTrigger';
-    gsap.registerPlugin(ScrollTrigger)
-    const elements = document.querySelectorAll('.project-shell');
+    import { ScrollTrigger } from "gsap/ScrollTrigger";
 
-    for (let el of elements) {
-        if (el) {
-            let project = el as HTMLElement
-            project.addEventListener("mouseenter", () => {
-                gsap.to(project.querySelector(".gif"), { filter: 'blur(0px)', duration: 0.1, ease: "power2.in" })
+    gsap.registerPlugin(ScrollTrigger);
+
+    const motion = gsap.matchMedia();
+    motion.add({
+        allowMotion: "(prefers-reduced-motion: no-preference)",
+        wide: "(min-width: 760px)",
+        twoColumnHomepage: "(min-width: 1100px)",
+    }, ({ conditions }) => {
+        if (!conditions?.allowMotion) return;
+
+        document.querySelectorAll<HTMLElement>(".project-shell").forEach((card, index) => {
+            const columnIndex = conditions.twoColumnHomepage ? index : index - 1;
+            const direction = conditions.wide && columnIndex >= 0 ? (columnIndex % 2 === 0 ? -1 : 1) : 0;
+
+            gsap.timeline({
+                defaults: { ease: "none" },
+                scrollTrigger: {
+                    trigger: card.parentElement,
+                    start: "top 99%",
+                    end: "bottom 1%",
+                    scrub: 0.45,
+                },
             })
-
-            project.addEventListener("mouseleave", () => {
-                gsap.to(project.querySelector(".gif"), { filter: 'blur(3px)', duration: 0.1, ease: "power2.in" })
-            })
-
-            gsap.fromTo(project,
-                { x: -100, autoAlpha: 0 },
-                {
-                    x: 0,
-                    autoAlpha: 1,
-                    duration: 0.8,
-                    ease: 'power2.out',
-                    scrollTrigger: {
-                        trigger: project,
-                        start: 'top 100%',
+                .fromTo(card,
+                    {
+                        x: direction * 44,
+                        y: direction ? 16 : 30,
+                        rotationX: 6,
+                        rotationZ: direction * 1.5,
+                        opacity: 0,
+                        transformPerspective: 900,
+                    },
+                    {
+                        x: 0,
+                        y: 0,
+                        rotationX: 0,
+                        rotationZ: 0,
+                        opacity: 1,
+                        duration: 0.19,
+                        ease: "power2.out",
                     }
-                }
-            );
-        }
-    }
-
+                )
+                .to(card, {
+                    x: direction * 30,
+                    y: -24,
+                    rotationX: -5,
+                    rotationZ: direction * 1.2,
+                    opacity: 0,
+                    duration: 0.17,
+                    ease: "power1.in",
+                }, 0.83);
+        });
+    });
 </script>

@@ -2,91 +2,35 @@
 import  SpeedInsights  from "@vercel/speed-insights/astro"
 import Analytics from '@vercel/analytics/astro'
 
+const { title = 'Brandon Eastwell | Software Engineer' } = Astro.props;
+
 ---
 <!doctype html>
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="description" content="Full-Stack, Software Engineer Portfolio">
-		<meta name="viewport" content="width=device-width" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<link rel="icon" type="image/x-icon" href="/favicon.ico?v=2" sizes="16x16 32x32 48x48" />
 		<link rel="icon" type="image/png" href="/favicon-96x96.png?v=2" sizes="96x96" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" sizes="any" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Brandon Eastwell | Software Engineer</title>
+		<title>{title}</title>
 	</head>
-	<SpeedInsights />
-	<Analytics />
-	<body class="portfolio-background isolate min-h-screen h-auto overflow-x-hidden bg-[#1A1A1B]">
-		<div class="ambient-light" aria-hidden="true">
-            <canvas class="ambient-dust"></canvas>
+	<body class="portfolio-background">
+		<SpeedInsights />
+		<Analytics />
+        <div class="ambient-viewport" aria-hidden="true">
+            <div class="ambient-light">
+                <canvas class="ambient-static"></canvas>
+                <canvas class="ambient-dust"></canvas>
+            </div>
         </div>
 		<slot />
-		<div class="pointer-circle" aria-hidden="true" hidden></div>
 	</body>
 </html>
 <script>
-    const pointerCircle = document.querySelector<HTMLElement>(".pointer-circle");
-    const smoothCursor = window.matchMedia("(any-pointer: fine) and (prefers-reduced-motion: no-preference)");
-
-    if (pointerCircle) {
-        const circle = pointerCircle;
-        let x = 0;
-        let y = 0;
-        let targetX = 0;
-        let targetY = 0;
-        let frame = 0;
-
-        function render() {
-            circle.style.transform = `translate3d(${x}px, ${y}px, 0)`;
-        }
-
-        function follow() {
-            x += (targetX - x) * 0.18;
-            y += (targetY - y) * 0.18;
-
-            if (Math.hypot(targetX - x, targetY - y) < 0.2) {
-                x = targetX;
-                y = targetY;
-                frame = 0;
-            } else {
-                frame = requestAnimationFrame(follow);
-            }
-
-            render();
-        }
-
-        function hide() {
-            cancelAnimationFrame(frame);
-            frame = 0;
-            circle.hidden = true;
-            document.body.classList.remove("custom-cursor");
-        }
-
-        window.addEventListener("pointermove", (event) => {
-            if (!smoothCursor.matches || event.pointerType !== "mouse") {
-                hide();
-                return;
-            }
-
-            targetX = event.clientX;
-            targetY = event.clientY;
-
-            if (circle.hidden) {
-                x = targetX;
-                y = targetY;
-                render();
-                circle.hidden = false;
-                document.body.classList.add("custom-cursor");
-            } else if (!frame) {
-                frame = requestAnimationFrame(follow);
-            }
-        }, { passive: true });
-
-        document.documentElement.addEventListener("pointerleave", hide);
-        window.addEventListener("blur", hide);
-        smoothCursor.addEventListener("change", hide);
-    }
+    import { createAmbientStatic } from "../scripts/ambient-static";
 
     const dust = document.querySelector<HTMLCanvasElement>(".ambient-dust");
     const light = dust?.parentElement;
@@ -96,6 +40,16 @@ import Analytics from '@vercel/analytics/astro'
         const canvas = dust;
         const ambientLight = light;
         const ctx = context;
+        const staticCanvas = ambientLight.querySelector<HTMLCanvasElement>(".ambient-static");
+        const animatedStatic = staticCanvas ? createAmbientStatic(staticCanvas) : null;
+
+        if (animatedStatic && staticCanvas) {
+            ambientLight.classList.add("has-animated-static");
+            staticCanvas.addEventListener("webglcontextlost", () => {
+                ambientLight.classList.remove("has-animated-static");
+            });
+        }
+
         const motion = window.matchMedia("(prefers-reduced-motion: no-preference)");
         const motes = Array.from({ length: 280 }, () => ({
             x: 0.18 + Math.random() * 0.67,
@@ -113,8 +67,12 @@ import Analytics from '@vercel/analytics/astro'
 
         function draw(time: number) {
             const lightStyle = getComputedStyle(ambientLight);
-            const lightX = width * parseFloat(lightStyle.getPropertyValue("--ambient-light-x")) / 100;
-            const lightY = height * parseFloat(lightStyle.getPropertyValue("--ambient-light-y")) / 100;
+            const lightXRatio = (parseFloat(lightStyle.getPropertyValue("--ambient-light-x")) || 50) / 100;
+            const lightYRatio = (parseFloat(lightStyle.getPropertyValue("--ambient-light-y")) || 50) / 100;
+            const lightX = width * lightXRatio;
+            const lightY = height * lightYRatio;
+
+            animatedStatic?.draw(time / 1000, lightXRatio, lightYRatio);
 
             ctx.clearRect(0, 0, width, height);
             ctx.fillStyle = "#f4efe2";
@@ -152,6 +110,7 @@ import Analytics from '@vercel/analytics/astro'
             canvas.width = Math.round(width * scale);
             canvas.height = Math.round(height * scale);
             ctx.setTransform(scale, 0, 0, scale, 0, 0);
+            animatedStatic?.resize(width, height);
             draw(motion.matches ? performance.now() : 0);
         }
 
@@ -172,35 +131,17 @@ import Analytics from '@vercel/analytics/astro'
 </script>
 
 <style>
-    .pointer-circle {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 200;
-        width: 18px;
-        height: 18px;
-        translate: -50% -50%;
-        pointer-events: none;
+    :global(html) {
+        background-color: #1a1a1b;
+        color-scheme: dark;
     }
 
-    .pointer-circle::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border: 1px solid #eae6e3;
-        border-radius: 50%;
-        background: rgb(26 26 27 / 50%);
-        scale: 1;
-        transition: scale 180ms ease-out;
-    }
-
-    :global(.custom-cursor:has(a:hover, .project:hover)) .pointer-circle::before {
-        scale: 1.35;
-    }
-
-    :global(.custom-cursor),
-    :global(.custom-cursor *) {
-        cursor: none !important;
+    .portfolio-background {
+        margin: 0;
+        min-height: 100vh;
+        overflow-x: clip;
+        isolation: isolate;
+        background-color: #1a1a1b;
     }
 
     @property --ambient-light-x {
@@ -224,16 +165,32 @@ import Analytics from '@vercel/analytics/astro'
         background: linear-gradient(to bottom left, #212121 5%, #1a1a1b 50%);
     }
 
-    .ambient-light {
+    .portfolio-background::after {
+        content: "";
         position: fixed;
-        inset: -40%;
+        inset: 0;
         z-index: -1;
         pointer-events: none;
+        background: url("../assets/background-static.png") repeat;
+        opacity: 0.08;
+    }
+
+    .ambient-viewport {
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .ambient-light {
+        position: absolute;
+        inset: -40%;
         transform: translate(
             calc(-3.4 * var(--pointer-shift-x, 0px)),
             calc(-3.4 * var(--pointer-shift-y, 0px))
         );
-        --light-shape: ellipse 43% 46% at var(--ambient-light-x) var(--ambient-light-y);
+        --light-shape: ellipse 43% 46% at var(--ambient-light-x, 50%) var(--ambient-light-y, 50%);
         background: radial-gradient(
             var(--light-shape),
             rgb(235 236 240 / 8%),
@@ -246,6 +203,22 @@ import Analytics from '@vercel/analytics/astro'
         );
     }
 
+    .ambient-light:not(.has-animated-static)::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("../assets/background-static.png") repeat;
+        mask-image: radial-gradient(
+            var(--light-shape),
+            #000,
+            rgb(0 0 0 / 65%) 18%,
+            rgb(0 0 0 / 12%) 36%,
+            transparent 52%
+        );
+        opacity: 0.74;
+    }
+
+    .ambient-static,
     .ambient-dust {
         position: absolute;
         inset: 0;
@@ -255,7 +228,7 @@ import Analytics from '@vercel/analytics/astro'
 
     @media (prefers-reduced-motion: no-preference) {
         .ambient-light {
-            animation: glow-horizontal 100s ease-in-out infinite, glow-vertical 100s ease-in-out -25s infinite;
+            animation: glow-horizontal 160s ease-in-out infinite, glow-vertical 160s ease-in-out -40s infinite;
         }
     }
 

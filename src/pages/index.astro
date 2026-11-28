@@ -1,5 +1,6 @@
 ---
 import Header from '../components/header.astro';
+import About from '../components/about.astro';
 import Layout from '../layouts/Layout.astro';
 import Links from "../components/links.astro";
 import Projects from "../components/projects.astro";
@@ -16,15 +17,40 @@ import "../styles/global.css";
 			</div>
 		</div>
 	</div>
-	<div class="page-column portfolio-foreground">
-		<div class="foreground-plane flex flex-row gap-4">
-			<Links />
+	<main class="portfolio-foreground">
+		<div class="intro-region foreground-plane">
+			<div class="page-column intro-column">
+				<div class="mobile-intro-links foreground-plane flex flex-row gap-4">
+					<Links />
+				</div>
+				<div class="intro-profile foreground-plane"><Header /></div>
+				<nav class="section-nav foreground-plane" aria-label="Portfolio sections">
+					<a href="#about" aria-current="location">About</a>
+					<a href="#projects">Projects</a>
+					<a href="#experience">Experience</a>
+					<a href="#contact">Contact</a>
+				</nav>
+				<section class="currently-building foreground-plane" aria-labelledby="currently-building-heading">
+					<h2 id="currently-building-heading" class="font-jersey text-sm uppercase tracking-widest text-[#EAE6E3]/65">Currently building</h2>
+					<a class="mt-1 inline-block font-jersey text-xl text-[#EAE6E3] underline-offset-4 hover:underline focus-visible:underline" href="/projects/outdoor-reflections/" aria-label="Read the Outdoor Reflections case study">Outdoor Reflections <span class="text-sm" aria-hidden="true">↗</span></a>
+					<p class="mt-1 max-w-[40ch] font-hanken text-sm leading-snug text-[#EAE6E3]/75">Exploring how a Python service can help hikers find patterns in past reflections.</p>
+				</section>
+				<div class="desktop-intro-links foreground-plane flex-row gap-4">
+					<Links />
+				</div>
+			</div>
+			<div class="page-column about-column">
+				<div class="about-plane foreground-plane"><About /></div>
+			</div>
 		</div>
-		<div class="foreground-plane"><Header /></div>
-		<div class="foreground-plane"><Experience /></div>
-		<Projects />
-		<div class="foreground-plane"><Footer /></div>
-	</div>
+		<div class="content-column">
+			<Projects />
+			<div class="page-column footer-column">
+				<div id="experience" class="foreground-plane scroll-mt-8"><Experience /></div>
+				<div id="contact" class="foreground-plane scroll-mt-8"><Footer /></div>
+			</div>
+		</div>
+	</main>
 </Layout>
 
 <style>
@@ -32,6 +58,25 @@ import "../styles/global.css";
 
     .page-column {
         @apply mx-auto max-w-[430px] px-6 py-6;
+    }
+
+    .intro-column {
+        padding-bottom: 0;
+    }
+
+    .about-column,
+    .footer-column {
+        padding-block-start: 0;
+    }
+
+    .about-column {
+        padding-block-end: 0;
+    }
+
+    .section-nav,
+    .currently-building,
+    .desktop-intro-links {
+        display: none;
     }
 
     .linkbar {
@@ -44,6 +89,144 @@ import "../styles/global.css";
         visibility: visible;
         transform: translateY(0);
         transition-delay: 0s;
+    }
+
+    @media (width < 1100px) {
+        .portfolio-foreground {
+            overflow-x: clip;
+        }
+
+        .intro-region .mobile-intro-links,
+        .intro-region .intro-profile,
+        .intro-region .about-plane {
+            transform: none;
+        }
+    }
+
+    @media (min-width: 1100px) {
+        .portfolio-foreground {
+            --desktop-inset: clamp(3rem, 6vw, 6rem);
+            --intro-height: calc(100svh - 2 * var(--desktop-inset));
+            --about-bottom-space: calc(var(--desktop-inset) + 1rem);
+            display: grid;
+            grid-template-columns: minmax(340px, 400px) minmax(0, 610px);
+            align-items: start;
+            justify-content: space-between;
+            column-gap: 60px;
+            width: 100%;
+            max-width: 1280px;
+            margin-inline: auto;
+            padding: var(--desktop-inset) 2rem 0;
+        }
+
+        .portfolio-foreground > .intro-region {
+            display: contents;
+            transform: none;
+        }
+
+        .intro-column,
+        .about-column,
+        .footer-column {
+            width: 100%;
+            margin-inline: 0;
+            padding-inline: 0;
+        }
+
+        .intro-column {
+            grid-column: 1;
+            grid-row: 1 / span 2;
+            display: flex;
+            flex-direction: column;
+			justify-content: space-between;
+			padding-top: 0;
+        }
+
+        .about-column {
+            grid-column: 2;
+            display: flex;
+            min-height: calc(var(--intro-height) + var(--about-bottom-space));
+            padding-block-end: var(--about-bottom-space);
+            max-width: 610px;
+        }
+
+        .about-column > .about-plane {
+            display: flex;
+            width: 100%;
+            transform-origin: top center;
+        }
+
+        .content-column {
+            grid-column: 2;
+            min-width: 0;
+            --project-column-gap: clamp(1.75rem, 4vw, 3rem);
+        }
+
+        .content-column :global(.projects-section) {
+            margin-top: 0;
+            padding-inline: 0;
+        }
+
+        .content-column :global(.projects-section > h2) {
+            max-width: none;
+        }
+
+        .linkbar,
+        .mobile-intro-links {
+            display: none;
+        }
+
+        .section-nav {
+            @apply mt-6 grid w-fit gap-2 font-jersey text-lg uppercase tracking-widest text-[#EAE6E3]/75;
+        }
+
+        .section-nav a {
+            @apply flex items-center gap-2 hover:text-[#EAE6E3] focus-visible:text-[#EAE6E3];
+        }
+
+        .section-nav a::before {
+            content: "";
+            width: 1.5rem;
+            height: 1px;
+            background: currentColor;
+        }
+
+        .section-nav a[aria-current="location"] {
+            color: #eae6e3;
+        }
+
+        .section-nav a[aria-current="location"]::before {
+            width: 2.75rem;
+        }
+
+        .currently-building {
+            display: block;
+            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgb(234 230 227 / 18%);
+        }
+
+        .desktop-intro-links {
+            display: flex;
+            padding-top: 2rem;
+        }
+    }
+
+    @media (min-width: 1100px) and (min-height: 700px) {
+        .intro-column {
+            position: sticky;
+            top: var(--desktop-inset);
+            min-height: var(--intro-height);
+        }
+    }
+
+    @media (min-width: 1100px) and (prefers-reduced-motion: no-preference) {
+        :global(html) {
+            scroll-behavior: smooth;
+        }
+
+        .section-nav a::before {
+            transition: width 220ms ease;
+        }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -120,6 +303,48 @@ import "../styles/global.css";
             frame = previousTime = x = y = targetX = targetY = 0;
             renderPerspective();
         });
+    }
+
+    const sectionLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>(".section-nav a")).flatMap((link) => {
+        const section = document.getElementById(link.hash.slice(1));
+        return section ? [{ link, section }] : [];
+    });
+
+    if (sectionLinks.length) {
+        let scheduled = false;
+
+        function updateActiveSection() {
+            scheduled = false;
+            const readingLine = window.innerHeight * 0.34;
+            let active = sectionLinks[0];
+
+            for (const target of sectionLinks) {
+                if (target.section.getBoundingClientRect().top <= readingLine) active = target;
+            }
+
+            if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+                active = sectionLinks[sectionLinks.length - 1];
+            }
+
+            for (const { link } of sectionLinks) {
+                if (link === active.link) {
+                    link.setAttribute("aria-current", "location");
+                } else {
+                    link.removeAttribute("aria-current");
+                }
+            }
+        }
+
+        function queueActiveSection() {
+            if (scheduled) return;
+            scheduled = true;
+            requestAnimationFrame(updateActiveSection);
+        }
+
+        updateActiveSection();
+        window.addEventListener("scroll", queueActiveSection, { passive: true });
+        window.addEventListener("resize", queueActiveSection);
+        window.addEventListener("pageshow", queueActiveSection);
     }
 
     const linkbar = document.querySelector<HTMLElement>(".linkbar");

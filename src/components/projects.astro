@@ -1,32 +1,94 @@
 ---
 import Project from "./project.astro";
-import sivterDemo from "../assets/landing-demo.gif"
-import raDemo from "../assets/ra-demo.gif"
-import lrsDemo from "../assets/lrs-services.vercel.app_(iPhone 14 Pro Max).png"
-import photoappDemo from "../assets/photoapp-cover.gif"
-import outdoorReflectionsDemo from "../assets/outdoor-reflections-page.png"
+import { projects } from "../data/projects";
 ---
 
-<section class="projects-section mt-16">
-    <h2 class="text-xl text-[#EAE6E3] font-jersey uppercase tracking-widest">Projects</h2>
-    <div class="flex flex-col flex-wrap gap-6 mt-6">
-        <Project index="1" toolBackground="#852b3c" edgeColor="#862d41" img={outdoorReflectionsDemo.src} gitUrl="https://github.com/brandoneastwell/outdoor-reflections" liveUrl="https://outdoor-reflections.com"
-                 title="Outdoor Reflections - Offline Journal"
-                 description="An offline hiking journal that syncs notes and sketches when you reconnect." tools={["React", "TypeScript", "Next.js", "NestJS", "Prisma", "PostgreSQL"]} />
-        <Project index="2" toolBackground="#30333a" img={photoappDemo.src} gitUrl="https://github.com/brandoneastwell/photography-app" liveUrl="https://photosmap.co.uk"
-                 title="Photography Sharing & Search Platform"
-                 description="A mobile and web platform for sharing and finding photos." tools={["React Native", "TypeScript", "Python", "Django", "PostgreSQL", "Mobile & Web"]} />
-        <Project index="3" toolBackground="#4c357a" img={sivterDemo.src} gitUrl="https://github.com/brandoneastwell/movie-discovery-app" liveUrl="https://sivter-app.vercel.app/"
-                 title="Sivter Movie Discovery"
-                 description="A web app for discovering films to watch." tools={["Next.js", "React", "TailwindCSS", "TypeScript", "Prisma", "PostgreSQL"]} />
-        <Project index="4" toolBackground="#a1232d" img={raDemo.src} gitUrl="https://github.com/brandoneastwell/ra-set-finder" liveUrl="https://github.com/BrandonEastwell/ra-set-finder"
-                 title="RA Set Finder"
-                 description="A Chrome extension that finds DJ sets on YouTube from Resident Advisor lineups." tools={["React", "TypeScript", "TailwindCSS", "Express", "Chrome Extension"]} />
-        <Project index="5" toolBackground="#18567b" img={lrsDemo.src} gitUrl="https://github.com/brandoneastwell/lrs-services" liveUrl="https://lrs-services.vercel.app/"
-                 title="LRS Exterior Services"
-                 description="A website showcasing a local exterior services business." tools={["React", "TypeScript", "TailwindCSS", "Express"]} />
+<section id="projects" class="projects-section mx-auto mt-16 w-full max-w-[430px] scroll-mt-24 px-6">
+    <h2 class="mx-auto max-w-[382px] text-xl text-[#EAE6E3] font-jersey uppercase tracking-widest min-[1100px]:sr-only">Projects</h2>
+    <div class="project-list mt-6 grid items-start gap-9 min-[1100px]:mt-0">
+        {projects.map((project) => <Project {...project} />)}
     </div>
 </section>
+
+<style>
+    @media (min-width: 760px) {
+        .projects-section {
+            max-width: 62rem;
+            padding-inline: 2rem;
+        }
+
+        .project-list {
+            grid-template-columns: minmax(0, 1.07fr) minmax(0, 1fr);
+            gap: 0 var(--project-column-gap, clamp(2.75rem, 7vw, 6rem));
+        }
+
+    }
+
+    @media (760px <= width < 1100px) {
+        .project-list > :global(:first-child) {
+            grid-column: 1 / -1;
+            width: min(49%, 30rem);
+            justify-self: center;
+            margin-inline-end: clamp(1.5rem, 9vw, 8rem);
+            margin-bottom: 5rem;
+            --project-height: 23rem;
+        }
+
+        .project-list > :global(:nth-child(2n + 2)) {
+            --project-height: 18rem;
+            width: 88%;
+            justify-self: start;
+        }
+
+        .project-list > :global(:nth-child(2n + 3)) {
+            --project-height: 16.5rem;
+            width: 100%;
+            justify-self: end;
+            margin-top: 9rem;
+        }
+
+        .project-list > :global(:nth-child(4)) {
+            --project-height: 16rem;
+            width: 100%;
+            justify-self: end;
+            margin-top: -1rem;
+        }
+
+        .project-list > :global(:nth-child(5)) {
+            --project-height: 19rem;
+            width: 84%;
+            margin-top: 7rem;
+        }
+    }
+
+    @media (min-width: 1100px) {
+        .project-list {
+            row-gap: 2rem;
+        }
+
+        .project-list > :global(:nth-child(odd)) {
+            --project-height: 17rem;
+        }
+
+        .project-list > :global(:nth-child(even)) {
+            --project-height: 16rem;
+            margin-top: 3.5rem;
+        }
+
+        .project-list > :global(:first-child) {
+            --project-height: 21rem;
+        }
+
+        .project-list > :global(:nth-child(3)) {
+            width: 92%;
+        }
+
+        .project-list > :global(:nth-child(4)) {
+            --project-height: 18rem;
+            margin-top: 4.5rem;
+        }
+    }
+</style>
 
 <script>
     import { gsap } from "gsap";
